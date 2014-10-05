@@ -18,6 +18,7 @@ if 'test' in sys.argv:
     setup_requires.append('pytest')
 
 install_requires = [
+    'decorator',
     'requests',
     'mock',
     'six',
