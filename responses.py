@@ -30,12 +30,15 @@ else:
     from io import BytesIO as BufferIO
 
 from collections import namedtuple, Sequence, Sized
-from functools import wraps
 from requests.exceptions import ConnectionError
+
+from decorator import decorator
+
 try:
     from requests.packages.urllib3.response import HTTPResponse
 except ImportError:
     from urllib3.response import HTTPResponse
+
 if six.PY2:
     from urlparse import urlparse, parse_qsl
 else:
@@ -122,15 +125,15 @@ class RequestsMock(object):
         return self._calls
 
     def activate(self, func):
-        @wraps(func)
-        def wrapped(*args, **kwargs):
+        def wrapper(func, *args, **kwargs):
             self.start()
             try:
                 return func(*args, **kwargs)
             finally:
                 self.stop()
                 self.reset()
-        return wrapped
+
+        return decorator(wrapper, func)
 
     def _find_match(self, request):
         for match in self._urls:
