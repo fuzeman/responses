@@ -98,16 +98,20 @@ class RequestsMock(object):
         if isinstance(body, six.text_type):
             body = body.encode('utf-8')
 
-        self._urls.append({
+        result = {
             'url': url,
             'method': method,
             'body': body,
-            'content_type': content_type,
             'match_querystring': match_querystring,
             'status': status,
             'adding_headers': adding_headers,
             'stream': stream,
-        })
+        }
+
+        if content_type:
+            result['content_type'] = content_type
+
+        self._urls.append(result)
 
     def add_callback(self, method, url, callback, match_querystring=False,
                      content_type='text/plain'):
@@ -186,9 +190,10 @@ class RequestsMock(object):
             self._calls.add(request, response)
             raise response
 
-        headers = {
-            'Content-Type': match['content_type'],
-        }
+        headers = {}
+
+        if match.get('content_type'):
+            headers['Content-Type'] = match['content_type']
 
         if 'callback' in match:  # use callback
             status, r_headers, body = match['callback'](request)
