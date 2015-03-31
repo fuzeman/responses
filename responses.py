@@ -198,7 +198,7 @@ class RequestsMock(object):
         if 'callback' in match:  # use callback
             status, r_headers, body = match['callback'](request)
 
-            if isinstance(body, six.string_types):
+            if not isinstance(body, BufferIO):
                 body = BufferIO(body.encode('utf-8'))
 
             headers.update(r_headers)
@@ -208,7 +208,7 @@ class RequestsMock(object):
                 headers.update(match['adding_headers'])
             status = match['status']
 
-            if isinstance(match['body'], six.string_types):
+            if not isinstance(match['body'], BufferIO):
                 body = BufferIO(match['body'])
             else:
                 body = match['body']
